@@ -1,0 +1,36 @@
+name: Main pipeline
+
+on: [push, pull_request]
+
+jobs:
+  build-something:
+    name: Build something
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build something
+        run: dd if=/dev/urandom of=testfile bs=1M count=10
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: testfile
+          path: testfile
+
+  upload:
+    name: Create release and upload artifacts
+    needs:
+      - build-something
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+      - name: Inspect directory after downloading artifacts
+        run: ls -alFR
+      - name: Create release and upload artifacts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+            wget https://github.com/probonopd/uploadtool/raw/master/upload.sh
+            export TRAVIS_TAG=123
+            ./upload.sh **/testfile
+
