@@ -32,5 +32,5 @@ jobs:
         run: |
             wget https://github.com/probonopd/uploadtool/raw/master/upload.sh
             export TRAVIS_TAG=123
-            ./upload.sh **/testfile
+            bash upload.sh **/testfile
 
