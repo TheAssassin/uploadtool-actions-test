@@ -22,6 +22,8 @@ jobs:
       - build-something
     runs-on: ubuntu-18.04
     steps:
+      - name: Dump environment
+        run: env
       - name: Download artifacts
         uses: actions/download-artifact@v2
       - name: Inspect directory after downloading artifacts
