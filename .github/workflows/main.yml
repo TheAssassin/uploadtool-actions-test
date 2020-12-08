@@ -30,7 +30,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-            wget https://github.com/probonopd/uploadtool/raw/master/upload.sh
-            export TRAVIS_TAG=123
-            bash upload.sh **/testfile
+            pip3 install -U pip
+            pip3 install git+https://github.com/TheAssassin/pyuploadtool#egg=pyuploadtool
+            pyuploadtool **/testfile
 
