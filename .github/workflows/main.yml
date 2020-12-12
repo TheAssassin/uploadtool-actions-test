@@ -4,17 +4,25 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   build-something:
+    strategy:
+      fail-fast: false
+      matrix:
+        ARCH: [x86_64, i386]
+        DIST: [bionic, xenial]
     name: Build something
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
       - name: Build something
-        run: dd if=/dev/urandom of=testfile bs=1M count=10
+        env:
+          DIST: ${{ matrix.DIST }}
+          ARCH: ${{ matrix.ARCH }}
+        run: dd if=/dev/urandom of=testfile-"${DIST}"-"${ARCH}" bs=1M count=10
       - name: Archive artifacts
         uses: actions/upload-artifact@v2
         with:
           name: testfile
-          path: testfile
+          path: testfile*
 
   upload:
     name: Create release and upload artifacts
@@ -36,7 +44,8 @@ jobs:
           WEBDAV_PASSWORD: ${{ secrets.WEBDAV_PASSWORD }}
           WEBDAV_RELEASE_NAME: ""
         run: |
+            env | grep GITHUB_ | grep -v GITHUB_TOKEN
             wget -q https://github.com/TheAssassin/pyuploadtool/releases/download/continuous/pyuploadtool-x86_64.AppImage
             chmod +x pyuploadtool-x86_64.AppImage
-            ./pyuploadtool-x86_64.AppImage **/testfile
+            ./pyuploadtool-x86_64.AppImage **/testfile*
 
